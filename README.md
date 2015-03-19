@@ -1,10 +1,14 @@
-# OutlookPilot - A productivity plugin for Outlook, inspired by [MailPilot|http://mindsense.co/mailpilot/] #
+# OutlookPilot #
+
+A productivity plugin for Outlook, inspired by [MailPilot|http://mindsense.co/mailpilot/] #
+
+## Overview ##
 
 When I worked at [AWS|http://www.aws.com], I discovered [MailPilot|http://mindsense.co/mailpilot/] and quickly embraced its model of scheduling emails to be dealt with at some point in the future.  I especially like that the schedule is managed via a standard folder structure as opposed to a local metadata store as this allowed me to interact with the scheduling hierarchy using any mail client from any device.
 
 Now that I'm working for [Azure|http://www.azure.com], having a Mac as my primary machine suddenly became less of an option.  Thus, OutlookPilot was born.
 
-# FAQ #
+## FAQ ##
 
 1. Is OutlookPilot compatible with MailPilot such that I can use both on the same account?
 
