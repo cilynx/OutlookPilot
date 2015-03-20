@@ -72,7 +72,7 @@
             this.group1.Items.Add(this.button6);
             this.group1.Items.Add(this.button9);
             this.group1.Items.Add(this.box1);
-            this.group1.Label = "Defer";
+            this.group1.Label = "Pilot";
             this.group1.Name = "group1";
             // 
             // button1
