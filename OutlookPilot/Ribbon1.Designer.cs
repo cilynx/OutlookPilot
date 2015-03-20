@@ -47,15 +47,10 @@
             this.button9 = this.Factory.CreateRibbonButton();
             this.box1 = this.Factory.CreateRibbonBox();
             this.Today = this.Factory.CreateRibbonButton();
-            this.EOW = this.Factory.CreateRibbonButton();
             this.Whenever = this.Factory.CreateRibbonButton();
-            this.box2 = this.Factory.CreateRibbonBox();
-            this.Tomorrow = this.Factory.CreateRibbonButton();
-            this.PickDate = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.box1.SuspendLayout();
-            this.box2.SuspendLayout();
             // 
             // tab1
             // 
@@ -77,7 +72,6 @@
             this.group1.Items.Add(this.button6);
             this.group1.Items.Add(this.button9);
             this.group1.Items.Add(this.box1);
-            this.group1.Items.Add(this.box2);
             this.group1.Label = "Defer";
             this.group1.Name = "group1";
             // 
@@ -142,8 +136,7 @@
             // 
             this.box1.BoxStyle = Microsoft.Office.Tools.Ribbon.RibbonBoxStyle.Vertical;
             this.box1.Items.Add(this.Today);
-            this.box1.Items.Add(this.Tomorrow);
-            this.box1.Items.Add(this.EOW);
+            this.box1.Items.Add(this.Whenever);
             this.box1.Name = "box1";
             // 
             // Today
@@ -152,35 +145,11 @@
             this.Today.Name = "Today";
             this.Today.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.today_Click);
             // 
-            // EOW
-            // 
-            this.EOW.Label = "This Week";
-            this.EOW.Name = "EOW";
-            this.EOW.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.eow_Click);
-            // 
             // Whenever
             // 
             this.Whenever.Label = "Whenever";
             this.Whenever.Name = "Whenever";
             this.Whenever.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.Whenever_Click);
-            // 
-            // box2
-            // 
-            this.box2.BoxStyle = Microsoft.Office.Tools.Ribbon.RibbonBoxStyle.Vertical;
-            this.box2.Items.Add(this.PickDate);
-            this.box2.Items.Add(this.Whenever);
-            this.box2.Name = "box2";
-            // 
-            // Tomorrow
-            // 
-            this.Tomorrow.Label = "Tomorrow";
-            this.Tomorrow.Name = "Tomorrow";
-            this.Tomorrow.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.tomorrow_Click);
-            // 
-            // PickDate
-            // 
-            this.PickDate.Label = "Pick Date";
-            this.PickDate.Name = "PickDate";
             // 
             // Ribbon1
             // 
@@ -194,8 +163,6 @@
             this.group1.PerformLayout();
             this.box1.ResumeLayout(false);
             this.box1.PerformLayout();
-            this.box2.ResumeLayout(false);
-            this.box2.PerformLayout();
 
         }
 
@@ -213,12 +180,8 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonButton button8;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton button9;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Today;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton Tomorrow;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton EOW;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton Whenever;
         internal Microsoft.Office.Tools.Ribbon.RibbonBox box1;
-        internal Microsoft.Office.Tools.Ribbon.RibbonBox box2;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton PickDate;
     }
 
     partial class ThisRibbonCollection

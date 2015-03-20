@@ -14,8 +14,6 @@ namespace OutlookPilot
     {
        
         /* TODO:
-         * Weekend Detection / Warning / Rescheduling
-         * Busy Day Detection / Warning / Rescheduling
          * Calendar-based Busy Calculations
          */
 
