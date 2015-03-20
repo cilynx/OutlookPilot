@@ -28,14 +28,36 @@ namespace OutlookPilot
             Outlook.MAPIFolder pilotFolder = Globals.ThisAddIn.Application.Session.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox).Folders["Pilot"];
             
             /* Remove any empty Pilot folders */
-            for (int i=1; i <= pilotFolder.Folders.Count; i++)
+            Outlook.Folders childFolders = pilotFolder.Folders;
+            if (childFolders.Count > 0)
             {
-                if(pilotFolder.Folders[i].Items.Count == 0)
+                foreach (Outlook.Folder childFolder in childFolders)
                 {
-                    Debug.WriteLine(pilotFolder.Folders[i].Name + " is empty and we are deleting it");
-                    pilotFolder.Folders[i].Delete();
+                    if (childFolder.Items.Count == 0)
+                    {
+                        Debug.WriteLine(childFolder.Name + " is empty and we are deleting it");
+                        if (childFolder.Name.Length == 8) { childFolder.Delete(); } // Don't delete "blocked" folders even if they're empty
+                    }
                 }
             }
+        }
+
+        private string folderStatus(string folderName)
+        {
+            /* TODO: Make this configurable */
+            Outlook.MAPIFolder pilotFolder = Globals.ThisAddIn.Application.Session.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox).Folders["Pilot"];
+
+            /* Look through all Pilot folders and see if we have one that blocks this date */
+            Outlook.Folders childFolders = pilotFolder.Folders;
+            if(childFolders.Count > 0)
+            {
+                foreach(Outlook.Folder childFolder in childFolders)
+                {
+                    if (childFolder.Name.Equals(folderName)) { return ("present"); }
+                    if (childFolder.Name.StartsWith(folderName)) { return ("blocked"); }
+                }
+            }
+            return ("absent");
         }
 
         private void button1_Click(object sender, RibbonControlEventArgs e) { defer(DateTime.Now.AddDays(1)); }
@@ -58,76 +80,90 @@ namespace OutlookPilot
         private void defer(DateTime date)
         {
             /* Dialog Results */
-            DialogResult dr;
+            DialogResult skipBusy = DialogResult.Yes;
+            DialogResult skipWeekends = DialogResult.Yes;
+
             /* Prompt for Busy? */
             bool promptBusy = true;
             /* Prompt for Weekend? */
             bool promptWeekend = true;
 
+            Outlook.MAPIFolder targetFolder;
+
             /* "Whenever" passes yesterday.  Start scheduling options with tomorrow. */
             if(date < DateTime.Today)
             {
                 date = DateTime.Today.AddDays(1);
-                promptBusy = false;
-                promptWeekend = false;
-            }
-
-            /* If we're deferring to a weekend, let's make sure that's what we want */
-            if(date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
-            {
-                dr = DialogResult.Yes;
-                if (promptWeekend)
-                {
-                    dr = MessageBox.Show("The day you selected is a weekend.  Would you like to reschedule for the next available week day?", "Weekend Work?", MessageBoxButtons.YesNo);
-                }
-                if(dr == DialogResult.Yes)
-                {
-                    promptBusy = false;                      
-                    while(date.DayOfWeek != DayOfWeek.Monday)
-                    {
-                        date = date.AddDays(1);
-                    }
-                    Debug.WriteLine("Pushing out to Monday: " + date.ToString("yyyyMMdd"));
-                }
+                promptBusy = false;     // Don't prompt when we run into a busy day.  Just skip over it.
+                promptWeekend = false;  // Don't prompt when we come to a weekend.  Just skip over it.
             }
 
             /* Define the main Pilot folder
-             * TODO: Make this configurable */
-            Outlook.MAPIFolder pilotFolder = Globals.ThisAddIn.Application.Session.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox).Folders["Pilot"];            
+            * TODO: Make this configurable */
+            Outlook.MAPIFolder pilotFolder = Globals.ThisAddIn.Application.Session.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox).Folders["Pilot"];  
 
-            /* I like this format better than MailPilot's, but it means I should implement a MailPilot compatibility mode 
-             * such that MailPilot and OutlookPilot can be used on the same set of folders and play nice together */
-            String folderName = date.ToString("yyyyMMdd");
-
-            /* Create our targetFolder if it does not already exist then grab the object */
-            try { pilotFolder.Folders.Add(folderName); }
-            catch { Debug.WriteLine("Folder already exists: " + folderName); }
-            Outlook.MAPIFolder targetFolder = pilotFolder.Folders[folderName];
-
-            /* If we're already really busy on the target day, see if we want to push things out
-             * TODO: Make this configurable */
-            while(targetFolder.Items.Count >= 5)
+            while(true)
             {
-                dr = DialogResult.Yes; // Set to yes so we reschedule by default if the prompt is disabled
-                if(promptBusy)
+                /* Skip if the date is blocked */
+                if (folderStatus(date.ToString("yyyyMMdd")).Equals("blocked")) { date = date.AddDays(1); continue; }
+
+                /* If we're scheduling on a weekend, let's make sure that's what we want */
+                if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
                 {
-                    dr = MessageBox.Show("You're already pretty busy on " + folderName + ". Would you like to reschedule for your new available day?", "Getting Busy!", MessageBoxButtons.YesNo);
+                    if (promptWeekend)
+                    {
+                        promptWeekend = false; // Only prompt once
+                        skipWeekends = MessageBox.Show("The day you selected is a weekend.  Would you like to reschedule for the next available week day?", "Weekend Work?", MessageBoxButtons.YesNo);
+                    }
+
+                    if (skipWeekends == DialogResult.Yes) // We want to reschedule
+                    {
+                        while (date.DayOfWeek != DayOfWeek.Monday)
+                        {
+                            date = date.AddDays(1);
+                        }
+                        Debug.WriteLine("Pushing out to Monday: " + date.ToString("yyyyMMdd"));
+                        continue;
+                    }
+                    else // We do not want to reschedule
+                    {
+                        break;
+                    }
                 }
-                if (dr == DialogResult.Yes) // We want to reschedule
+
+                /* Create our target folder if it is absent */
+                if (folderStatus(date.ToString("yyyyMMdd")).Equals("absent")) { pilotFolder.Folders.Add(date.ToString("yyyyMMdd")); }
+
+                /* Grab our targetFolder */
+                targetFolder = pilotFolder.Folders[date.ToString("yyyyMMdd")];
+
+                /* If we're already busy on the target day, see if we want to push things out
+                 * TODO: Make this configurable */
+                if (targetFolder.Items.Count >= 5)
                 {
-                    promptBusy = false;
-                    date = date.AddDays(1);
-                    if (date.DayOfWeek == DayOfWeek.Saturday) { date = date.AddDays(2); } // Don't automagically schedule things on weekends
-                    folderName = date.ToString("yyyyMMdd");
-                    try { pilotFolder.Folders.Add(folderName); }
-                    catch { Debug.WriteLine("Folder already exists: " + folderName); }
-                    targetFolder = pilotFolder.Folders[folderName];
+                    if (promptBusy)
+                    {
+                        promptBusy = false;
+                        skipBusy = MessageBox.Show("You're already pretty busy on " + date.ToString("yyyyMMdd") + ". Would you like to reschedule for your new available day?", "Getting Busy!", MessageBoxButtons.YesNo);
+                    }
+
+                    if (skipBusy == DialogResult.Yes) // We want to reschedule
+                    {
+                        date = date.AddDays(1);
+                        continue;
+                    }
+                    else // We do not want to reschedule
+                    {
+                        break;
+                    }
                 }
-                else // We do not want to reschedule
-                {
-                    break;
-                }
+
+                /* If we make it this far, we have a date we can use */
+                break;
             }
+
+            /* Define targetFolder in case it didn't get defined above */
+            targetFolder = pilotFolder.Folders[date.ToString("yyyyMMdd")];
 
             /* Get our Selected message / conversation */
             Outlook.Selection selection = Globals.ThisAddIn.Application.ActiveExplorer().Selection;
@@ -175,13 +211,6 @@ namespace OutlookPilot
             }
 
             removeEmptyFolders();
-        }
-
-        private void NextWeek_Click(object sender, RibbonControlEventArgs e)
-        {
-
-        }
-
-       
+        }       
     }
 }
