@@ -16,7 +16,7 @@ OutlookPilot adds a collection of buttons to the Outlook Ribbon which enable you
 
 ### The Joy of Whenever ###
 
-The _Whenever_ button looks over your upcoming schedule and schedules the active item for the first workday that you're not busy.  As of today, _workday_ is defined as Monday-Friday and _busy_ is defined as <5 actions already scheduled on that day.  In the future, these could be configurable settings.  _Whenever_ is arguably OutlookPilot's best feature and one that is sadly absent from MailPilot.
+The _Whenever_ button looks over your upcoming schedule and schedules the active item for the first workday that you're not busy.  As of today, _workday_ is defined as Monday-Friday and _busy_ is defined as 5 or more actions already scheduled on that day.  In the future, these could be configurable settings.  _Whenever_ is arguably OutlookPilot's best feature and one that is sadly absent from MailPilot.
 
 (To be fair, MailPilot has a _Set Aside_ feature, but this puts the active message into a folder that you need to actively look at in the future when you have nothing better to do.  How often do you have nothing better to do?  When I was using MailPilot, I found that using _Set Aside_ was no better for me than archiving or deleting the item.)
 
@@ -47,7 +47,7 @@ OutlookPilot has a smidge of intelligence that will prompt you for confirmation 
 
 ### Blocked Days ###
 
-You can manually prevent OutlookPilot from scheduling on a specific day by creating a folder that starts with the date you care about and has anything else after it.  For example "20150401 - OOTO", "20150402: At Training", or even "20150403 " would all be valid _blocked_ folders.  OutlookPilot will pass right over them when autoscheduling similar to how it handles weekends.  _Blocked_ ranges are not currently supported because it's difficult to make elegant when viewing the folders on other clients.
+You can manually prevent OutlookPilot from scheduling on a specific day by creating a folder that starts with the date you care about and has anything else after it.  For example "20150401 - OOTO", "20150402: At Training", or even "20150403 " would all be valid _blocked_ folders.  OutlookPilot will pass right over them when autoscheduling similar to how it handles weekends.  OutlookPilot will not delete a _blocked_ folder, even if it's empty.  You will need to remove them manually when you're done with them.  _Blocked_ ranges are not currently supported because it's difficult to make elegant when viewing the folders on other clients.
 
 ## FAQ ##
 
