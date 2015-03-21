@@ -25,7 +25,7 @@ namespace OutlookPilot
         private void removeEmptyFolders()
         {
             /* TODO: Make this configurable */
-            Outlook.MAPIFolder pilotFolder = Globals.ThisAddIn.Application.Session.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox).Folders["Pilot"];
+            Outlook.Folder pilotFolder = Globals.ThisAddIn.Application.Session.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox).Folders["Pilot"] as Outlook.Folder;
             
             /* Remove any empty Pilot folders */
             Outlook.Folders childFolders = pilotFolder.Folders;
@@ -35,8 +35,11 @@ namespace OutlookPilot
                 {
                     if (childFolder.Items.Count == 0)
                     {
-                        Debug.WriteLine(childFolder.Name + " is empty and we are deleting it");
-                        if (childFolder.Name.Length == 8) { childFolder.Delete(); } // Don't delete "blocked" folders even if they're empty
+                        if (childFolder.Name.Length == 8) // Don't delete "blocked" folders even if they're empty
+                        { 
+                            Debug.WriteLine(childFolder.Name + " is empty and we are deleting it");
+                            childFolder.Delete(); 
+                        } 
                     }
                 }
             }
@@ -45,7 +48,7 @@ namespace OutlookPilot
         private string folderStatus(string folderName)
         {
             /* TODO: Make this configurable */
-            Outlook.MAPIFolder pilotFolder = Globals.ThisAddIn.Application.Session.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox).Folders["Pilot"];
+            Outlook.Folder pilotFolder = Globals.ThisAddIn.Application.Session.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox).Folders["Pilot"] as Outlook.Folder;
 
             /* Look through all Pilot folders and see if we have one that blocks this date */
             Outlook.Folders childFolders = pilotFolder.Folders;
@@ -88,7 +91,7 @@ namespace OutlookPilot
             /* Prompt for Weekend? */
             bool promptWeekend = true;
 
-            Outlook.MAPIFolder targetFolder;
+            Outlook.Folder targetFolder;
 
             /* "Whenever" passes yesterday.  Start scheduling options with tomorrow. */
             if(date < DateTime.Today)
@@ -100,7 +103,7 @@ namespace OutlookPilot
 
             /* Define the main Pilot folder
             * TODO: Make this configurable */
-            Outlook.MAPIFolder pilotFolder = Globals.ThisAddIn.Application.Session.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox).Folders["Pilot"];  
+            Outlook.Folder pilotFolder = Globals.ThisAddIn.Application.Session.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox).Folders["Pilot"] as Outlook.Folder;  
 
             while(true)
             {
@@ -135,7 +138,7 @@ namespace OutlookPilot
                 if (folderStatus(date.ToString("yyyyMMdd")).Equals("absent")) { pilotFolder.Folders.Add(date.ToString("yyyyMMdd")); }
 
                 /* Grab our targetFolder */
-                targetFolder = pilotFolder.Folders[date.ToString("yyyyMMdd")];
+                targetFolder = pilotFolder.Folders[date.ToString("yyyyMMdd")] as Outlook.Folder;
 
                 /* If we're already busy on the target day, see if we want to push things out
                  * TODO: Make this configurable */
@@ -163,7 +166,7 @@ namespace OutlookPilot
             }
 
             /* Define targetFolder in case it didn't get defined above */
-            targetFolder = pilotFolder.Folders[date.ToString("yyyyMMdd")];
+            targetFolder = pilotFolder.Folders[date.ToString("yyyyMMdd")] as Outlook.Folder;
 
             /* Get our Selected message / conversation */
             Outlook.Selection selection = Globals.ThisAddIn.Application.ActiveExplorer().Selection;
